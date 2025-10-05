@@ -3,6 +3,7 @@ import folium
 from streamlit_folium import st_folium
 from datetime import date
 import numpy as np
+import logic
 
 st.set_page_config(layout="wide", page_title="Wildfire Prediction Model", initial_sidebar_state="collapsed")
 
@@ -85,9 +86,19 @@ with col1:
     
     st.markdown("<br>", unsafe_allow_html=True)
     
+
     predict_button = st.button("Predict", type="primary", use_container_width=True)
     
     if predict_button:
+
+
+        offset_deg = rectangle_offset / 111.0
+    
+        bounds = [
+            [latitude - offset_deg, longitude - offset_deg],
+            [latitude + offset_deg, longitude + offset_deg]
+        ]
+        out_image =logic.logic_func(latitude,longitude,date_to_predict,bounds)
         st.session_state.prediction_made = True
         st.session_state.pred_long = longitude
         st.session_state.pred_lat = latitude
@@ -138,6 +149,7 @@ with col2:
             sample_points.append([rand_lat, rand_lon])
         
         #TODO: KRIGING
+        out_image.add_to(m)
         
         for point in sample_points:
             risk_level = np.random.uniform(0, 1)
@@ -161,7 +173,9 @@ with col2:
                 fillColor=color,
                 fillOpacity=0.7
             ).add_to(m)
-    
+        
+        
+
     st_folium(m, width=None, height=800, returned_objects=[])
 
 if 'prediction_made' in st.session_state and st.session_state.prediction_made:
