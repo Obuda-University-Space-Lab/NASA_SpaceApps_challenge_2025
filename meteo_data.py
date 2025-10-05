@@ -63,24 +63,37 @@ def make_daily_dataframe(
 
     return df
 
+import pandas as pd
+from typing import List, Tuple
+
+
 def is_within_bounds(lat: float, lon: float, bounds: List[List[float]]) -> bool:
+    """Check if (lat, lon) is inside rectangular bounds [[lat_min, lon_min], [lat_max, lon_max]]."""
     return (bounds[0][0] <= lat <= bounds[1][0]) and (bounds[0][1] <= lon <= bounds[1][1])
 
-def load_coordinates_from_txt(filepath: str, bounds: List[List[float]]) -> List[Tuple[float, float]]:
-    """Read coordinates from txt file and return only those within bounds."""
-    coords = []
-    with open(filepath, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                try:
-                    lat, lon = map(float, line.split(","))
-                    if is_within_bounds(lat, lon, bounds):
-                        coords.append((lat, lon))
-                except ValueError:
-                    print(f"Skipping invalid line: {line}")
-    return coords
 
+def load_coordinates_from_csv(filepath: str, bounds: List[List[float]]) -> List[Tuple[float, float]]:
+    """
+    Read coordinates from CSV file and return only those within bounds.
+    The CSV must have columns named 'latitude' and 'longitude'.
+    """
+    coords = []
+    try:
+        df = pd.read_csv(filepath)
+
+        # Ensure required columns exist
+        if not {"latitude", "longitude"}.issubset(df.columns):
+            raise ValueError("CSV must contain 'latitude' and 'longitude' columns.")
+
+        for _, row in df.iterrows():
+            lat, lon = float(row["latitude"]), float(row["longitude"])
+            if is_within_bounds(lat, lon, bounds):
+                coords.append((lat, lon))
+
+    except Exception as e:
+        print(f"Error loading CSV: {e}")
+
+    return coords
 
 def build_weather_dataframe(
     coords: List[Tuple[float, float]],
@@ -116,7 +129,7 @@ def meteo_data_extract(lat, lon, start_date, end_date,bounds):
 
 
     # Load coordinates from txt file for only greece
-    coords = load_coordinates_from_txt("coordinates.txt", bounds)
+    coords = load_coordinates_from_csv("./data/greece_fire_places.csv", bounds)
 
     # Define variables
     hourly_vars = ["weather_code"]

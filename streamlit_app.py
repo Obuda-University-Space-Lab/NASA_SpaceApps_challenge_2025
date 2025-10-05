@@ -56,7 +56,7 @@ with col1:
         "Longitude",
         min_value=-180.0,
         max_value=180.0,
-        value=-120.0,
+        value=23.805668,
         step=0.1,
         format="%.4f"
     )
@@ -65,7 +65,7 @@ with col1:
         "Latitude",
         min_value=-90.0,
         max_value=90.0,
-        value=40.0,
+        value=38.20738,
         step=0.1,
         format="%.4f"
     )
