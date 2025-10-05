@@ -5,6 +5,10 @@ from datetime import date
 import numpy as np
 import logic
 
+def input_change():
+    st.session_state.prediction_made = False
+
+
 st.set_page_config(layout="wide", page_title="Wildfire Prediction Model", initial_sidebar_state="collapsed")
 
 st.markdown("""
@@ -45,7 +49,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("Wildfire Prediction Model")
+st.title("Inferno Watch")
 st.warning("⚠️🚧 **This is only a demo application!** 🚧⚠️\n\nUse it for testing and exploration purposes only.")
 
 col1, col2 = st.columns([1, 4])
@@ -59,7 +63,8 @@ with col1:
         max_value=180.0,
         value=23.805668,
         step=0.1,
-        format="%.4f"
+        format="%.4f",
+        on_change=input_change
     )
     
     latitude = st.number_input(
@@ -68,13 +73,15 @@ with col1:
         max_value=90.0,
         value=38.20738,
         step=0.1,
-        format="%.4f"
+        format="%.4f",
+        on_change=input_change
     )
     
     date_to_predict = st.date_input( # esetleg date-range?
         "Date to Predict",
         value=date.today(),
-        format="YYYY-MM-DD"
+        format="YYYY-MM-DD",
+        on_change=input_change
     )
     
     rectangle_offset = st.slider(
@@ -82,7 +89,8 @@ with col1:
         min_value=30,
         max_value=200,
         value=30,
-        step=10
+        step=10,
+        on_change=input_change
     )
     
     st.markdown("<br>", unsafe_allow_html=True)
@@ -95,11 +103,11 @@ with col1:
 
         offset_deg = rectangle_offset / 111.0
     
-        bounds = [
+        st.session_state.bounds = [
             [latitude - offset_deg, longitude - offset_deg],
             [latitude + offset_deg, longitude + offset_deg]
         ]
-        out_image, out_df =logic.logic_func(latitude,longitude,date_to_predict,bounds)
+        out_image, out_df =logic.logic_func(latitude,longitude,date_to_predict,st.session_state.bounds)
         st.session_state.prediction_made = True
         st.session_state.pred_long = longitude
         st.session_state.pred_lat = latitude
