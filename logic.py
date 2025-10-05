@@ -41,7 +41,7 @@ def logic_func(latitude,longitude,date_to_predict,bounds):
 
 
     #Mock data for testing the frontend
-    #mockdf=pd.read_csv("/Users/lszlpotyondi/PythonProjects/NASA_SpaceApps_challenge_2025/weather_output/all_locations_weather.csv")
+    #mockdf=pd.read_csv("weather_output/all_locations_weather.csv")
     #loc_id=-1
     #for idx, row in mockdf.iterrows():
     #    if int(row['location_id'])!=loc_id:
