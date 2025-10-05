@@ -115,6 +115,11 @@ User Input → Weather Data Retrieval → Risk Prediction → Kriging Interpolat
 
 ### Using the Interface
 
+<p align="center">
+  <img src="design_elements/UI/UI-new2.png" alt="UI Preview" width="800">
+</p>
+
+
 1. **Set Prediction Parameters**
    - **Longitude**: Enter longitude coordinate (-180.0 to 180.0)
    - **Latitude**: Enter latitude coordinate (-90.0 to 90.0)
