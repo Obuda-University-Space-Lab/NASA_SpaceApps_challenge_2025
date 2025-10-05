@@ -342,7 +342,7 @@ This project was developed for the NASA Space Apps Challenge 2025.
 
 **Óbuda University Space Lab**
 
-Developed by the team **Terra and Luna Analytics** for the NASA Space Apps Challenge 2025.
+Developed by the team **Terra and Luna Analytics**.
 
 Team members:
 
