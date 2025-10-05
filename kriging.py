@@ -12,18 +12,24 @@ from folium.raster_layers import ImageOverlay
 
 
 
-def krige_data(df, gridx,gridy):
-
-    latitude = df['Site Latitude'].values
-    longitude = df['Site Longitude'].values
+def krige_data(df, gridx,gridy, bounds):
+    latitude = df['latitude'].values
+    longitude = df['longitude'].values
     aqi_value = df['predicted_fire'].values
-
-    # Define the grid for interpolation
     
+    num_points = len(df)
+
+    lat_min, lon_min = bounds[0]
+    lat_max, lon_max = bounds[1]
+
+    gridx = np.linspace(lon_min, lon_max, num_points)  # longitude axis (x)
+    gridy = np.linspace(lat_min, lat_max, num_points)  # latitude axis (y)
 
 
 
 
+
+    print(aqi_value)
     # Perform Ordinary Kriging using the spherical variogram model
     OK = OrdinaryKriging(longitude, 
                          latitude, 
@@ -54,16 +60,10 @@ def krige_data(df, gridx,gridy):
     fig.savefig('kriging_interpolation.png', bbox_inches='tight', pad_inches=0, transparent=True)
     plt.close(fig)
 
-def image_overlay(gridx,gridy):
-    # Load the image with PIL
-    image = Image.open('kriging_interpolation.png')
-
-    # Create a base map centered on Houston
-    m = folium.Map(location=[29.76, -95.37], zoom_start=10)
-
+def image_overlay(gridx,gridy, bounds):
     # Define the bounds where the image will be placed
-    bounds = [[gridy.min(), gridx.min()], [gridy.max(), gridx.max()]]
-
+    #bounds = [[gridy.min(), gridx.min()], [gridy.max(), gridx.max()]]
+    print("image_overlay: "+str(bounds))
     # Add the image overlay
     image_overlay = ImageOverlay(
         image='kriging_interpolation.png',
