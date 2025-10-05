@@ -46,6 +46,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("Wildfire Prediction Model")
+st.warning("⚠️🚧 **This is only a demo application!** 🚧⚠️\n\nUse it for testing and exploration purposes only.")
 
 col1, col2 = st.columns([1, 4])
 
@@ -98,7 +99,7 @@ with col1:
             [latitude - offset_deg, longitude - offset_deg],
             [latitude + offset_deg, longitude + offset_deg]
         ]
-        out_image =logic.logic_func(latitude,longitude,date_to_predict,bounds)
+        out_image, out_df =logic.logic_func(latitude,longitude,date_to_predict,bounds)
         st.session_state.prediction_made = True
         st.session_state.pred_long = longitude
         st.session_state.pred_lat = latitude
@@ -121,7 +122,8 @@ with col2:
         [latitude - offset_deg, longitude - offset_deg],
         [latitude + offset_deg, longitude + offset_deg]
     ]
-    
+    print("Streamlit: "+str(bounds))
+
     folium.Rectangle(
         bounds=bounds,
         color="#6d25d1",
@@ -132,12 +134,12 @@ with col2:
         popup=f"Prediction Area: {rectangle_offset}km offset"
     ).add_to(m)
     
-    folium.Marker(
-        [latitude, longitude],
-        popup=f"Center: ({latitude:.4f}, {longitude:.4f})",
-        tooltip="Prediction Center",
-        icon=folium.Icon(color="red", icon="fire", prefix='fa')
-    ).add_to(m)
+    #folium.Marker(
+    #    [latitude, longitude],
+    #    popup=f"Center: ({latitude:.4f}, {longitude:.4f})",
+    #    tooltip="Prediction Center",
+    #    icon=folium.Icon(color="red", icon="fire", prefix='fa')
+    #).add_to(m)
     
     if 'prediction_made' in st.session_state and st.session_state.prediction_made:
         
@@ -151,29 +153,48 @@ with col2:
         #TODO: KRIGING
         out_image.add_to(m)
         
-        for point in sample_points:
-            risk_level = np.random.uniform(0, 1)
+        for idx, row in out_df.iterrows():
             
-            if risk_level < 0.3:
+            risk_level = row['predicted_fire']
+
+            if risk_level < 0.7:
                 color = 'green'
                 risk_text = 'Low'
-            elif risk_level < 0.7:
+                point=[row['latitude'], row['longitude']]
+                folium.CircleMarker(
+                    point,
+                    radius=2,
+                    popup=f"Risk: {risk_text} ({risk_level:.2%})",
+                    color=color,
+                    fill=True,
+                    fillColor=color,
+                    fillOpacity=0.7
+                ).add_to(m)
+
+            elif risk_level < 0.9:
                 color = 'orange'
                 risk_text = 'Medium'
+                point=[row['latitude'], row['longitude']]
+                folium.CircleMarker(
+                    point,
+                    radius=2,
+                    popup=f"Risk: {risk_text} ({risk_level:.2%})",
+                    color=color,
+                    fill=True,
+                    fillColor=color,
+                    fillOpacity=0.7
+                ).add_to(m)
+
             else:
                 color = 'red'
                 risk_text = 'High'
-            
-            folium.CircleMarker(
-                point,
-                radius=8,
-                popup=f"Risk: {risk_text} ({risk_level:.2%})",
-                color=color,
-                fill=True,
-                fillColor=color,
-                fillOpacity=0.7
-            ).add_to(m)
+                folium.Marker(
+                    [row['latitude'], row['longitude']],
+                    tooltip="Prediction Center",
+                    icon=folium.Icon(color="red", icon="fire", prefix='fa')
+                ).add_to(m)
         
+           
         
 
     st_folium(m, width=None, height=800, returned_objects=[])
